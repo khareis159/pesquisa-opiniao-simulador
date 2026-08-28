@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador Oficial de Urna Eletrônica - V3 Protegida</title>
+    <title>Simulador de Urna Eletrônica</title>
     <style>
         :root {
-            --bg-dark: #121826;
-            --card-bg: #1b2438;
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
             --text-light: #f8fafc;
             --accent-green: #2ed573;
             --accent-orange: #ff9500;
@@ -30,14 +30,27 @@
             align-items: center;
         }
 
+        .btn-link-dashboard {
+            background: var(--accent-blue);
+            color: #fff;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+
+        .btn-link-dashboard:hover { background: #2563eb; }
+
         .container {
-            display: grid;
-            grid-template-columns: 1fr 450px;
-            gap: 20px;
-            padding: 20px;
-            max-width: 1600px;
-            margin: 0 auto;
-            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
             flex: 1;
         }
 
@@ -45,12 +58,13 @@
         .urna-wrapper {
             background: var(--urna-body);
             border-radius: 16px;
-            padding: 25px;
+            padding: 30px;
             display: grid;
             grid-template-columns: 1fr 320px;
-            gap: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            align-self: start;
+            gap: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            max-width: 900px;
+            width: 100%;
         }
 
         .tela-urna {
@@ -71,7 +85,7 @@
         .cargo-titulo { font-size: 1.1rem; font-weight: bold; text-transform: uppercase; }
 
         .numero-box { display: flex; gap: 8px; margin: 15px 0; }
-        .digito { width: 35px; height: 45px; border: 2px solid #000; font-size: 1.8rem; font-weight: bold; display: flex; align-items: center; justify-content: center; background: #fff; }
+        .digito { width: 38px; height: 48px; border: 2px solid #000; font-size: 1.8rem; font-weight: bold; display: flex; align-items: center; justify-content: center; background: #fff; }
         .digito.pisca { animation: blink 1s infinite; }
         @keyframes blink { 0%, 100% { border-color: #000; } 50% { border-color: transparent; } }
 
@@ -90,52 +104,9 @@
         .btn-corrige { background: var(--accent-orange); color: #000; }
         .btn-confirma { background: var(--accent-green); color: #000; }
 
-        /* PAINEL ADMIN E AUTENTICAÇÃO */
-        .admin-panel {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 20px;
-            border: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            max-height: 88vh;
-            overflow-y: auto;
-            position: relative;
-        }
-
-        .auth-overlay {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 40px 20px;
-            text-align: center;
-            background: #0f172a;
-            border-radius: 8px;
-            border: 1px dashed var(--border-color);
-        }
-
-        .admin-content { display: none; flex-direction: column; gap: 15px; }
-        .admin-content.unlocked { display: flex; }
-
-        .admin-section { background: #0f172a; padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); }
-        .admin-section h3 { color: var(--accent-blue); font-size: 0.95rem; margin-bottom: 10px; }
-
-        .form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
-        .form-group label { font-size: 0.8rem; color: #94a3b8; }
-        .form-group input { padding: 8px; background: #1e293b; border: 1px solid var(--border-color); color: #fff; border-radius: 4px; font-size: 0.85rem; }
-
-        .btn-admin { width: 100%; padding: 10px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; background: var(--accent-blue); color: #fff; margin-top: 5px; }
-
-        .candidatos-grid { display: flex; flex-direction: column; gap: 8px; max-height: 180px; overflow-y: auto; }
-        .candidato-item { display: flex; justify-content: space-between; align-items: center; background: #1e293b; padding: 8px; border-radius: 4px; font-size: 0.85rem; }
-        .candidato-item img { width: 30px; height: 35px; object-fit: cover; border-radius: 2px; }
-
         footer { background: #0b0f17; color: #94a3b8; padding: 15px; text-align: center; font-size: 0.8rem; border-top: 1px solid var(--border-color); }
 
-        @media (max-width: 1024px) {
-            .container { grid-template-columns: 1fr; }
+        @media (max-width: 850px) {
             .urna-wrapper { grid-template-columns: 1fr; }
         }
     </style>
@@ -143,7 +114,7 @@
     <!-- FIREBASE SDK v10+ (REALTIME DATABASE) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, set, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, set, push, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAjkZHH3eNM3kaqLAsLfixIjLSsp7Cc5RI",
@@ -163,23 +134,18 @@
         window.dbSet = set;
         window.dbPush = push;
         window.dbOnValue = onValue;
-        window.dbRemove = remove;
     </script>
 </head>
 <body>
 
     <header>
-        <h2>🗳️ Sistema de Simulação Eleitoral - V3 Protegida</h2>
-        <div style="display: flex; gap: 15px; align-items: center;">
-            <span id="status-conexao" style="color: var(--accent-green); font-size: 0.85rem; font-weight: bold;">🟢 Firebase Sincronizado</span>
-            <button id="btn-toggle-admin" onclick="solicitarAcessoAdmin()" class="btn-admin" style="margin: 0; width: auto; padding: 6px 12px; background: var(--accent-orange); color: #000;">
-                🔑 Admin
-            </button>
-        </div>
+        <h2>🗳️ Simulador Oficial de Urna Eletrônica</h2>
+        <a href="dashboard.html" class="btn-link-dashboard">
+            📊 Painel & Dashboard de Apuração
+        </a>
     </header>
 
     <div class="container">
-        <!-- URNA ELETRÔNICA -->
         <div class="urna-wrapper">
             <div class="tela-urna" id="tela-urna">
                 <div class="tela-header">
@@ -217,75 +183,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- PAINEL ADMINISTRATIVO COM BLOQUEIO DE SEGURANÇA -->
-        <div class="admin-panel">
-            <h2 style="color: var(--accent-blue); font-size: 1.1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
-                ⚙️ Gestão & Controle Operacional
-            </h2>
-
-            <!-- TELA DE BLOQUEIO / LOGIN -->
-            <div id="auth-overlay" class="auth-overlay">
-                <h3 style="color: var(--accent-orange); margin-bottom: 10px;">🔒 Acesso Restrito ao Operador</h3>
-                <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 15px;">Digite a senha do operador para acessar o painel de cadastro e apuração.</p>
-                <div class="form-group" style="width: 100%; max-width: 250px;">
-                    <input type="password" id="senha-admin-input" placeholder="Senha de acesso" style="text-align: center;">
-                </div>
-                <button class="btn-admin" style="max-width: 250px;" onclick="validarSenha()">Entrar no Painel</button>
-            </div>
-
-            <!-- CONTEÚDO EXCLUSIVO DO OPERADOR (ESCONDIDO POR PADRÃO) -->
-            <div id="admin-content" class="admin-content">
-                <div style="display: flex; justify-content: space-between; align-items: center; background: #16213e; padding: 8px 12px; border-radius: 6px;">
-                    <span style="font-size: 0.8rem; color: var(--accent-green);">Sessão Autenticada</span>
-                    <button onclick="bloquearAdmin()" style="background: var(--accent-red); color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.75rem;">Sair / Bloquear</button>
-                </div>
-
-                <!-- CADASTRO DE CANDIDATOS -->
-                <div class="admin-section">
-                    <h3>➕ Cadastrar / Editar Candidato</h3>
-                    <form id="form-candidato" onsubmit="salvarCandidato(event)">
-                        <div class="form-group">
-                            <label>Número do Candidato (2 dígitos):</label>
-                            <input type="text" id="cand-numero" maxlength="2" required placeholder="Ex: 13">
-                        </div>
-                        <div class="form-group">
-                            <label>Nome Completo:</label>
-                            <input type="text" id="cand-nome" required placeholder="Ex: Maria da Silva">
-                        </div>
-                        <div class="form-group">
-                            <label>Partido / Sigla:</label>
-                            <input type="text" id="cand-partido" required placeholder="Ex: PARTIDO A">
-                        </div>
-                        <div class="form-group">
-                            <label>URL da Foto (PNG/JPG):</label>
-                            <input type="url" id="cand-foto" required placeholder="https://site.com/foto.jpg">
-                        </div>
-                        <button type="submit" class="btn-admin">Salvar no Firebase</button>
-                    </form>
-                </div>
-
-                <!-- LISTA DE CANDIDATOS CADASTRADOS -->
-                <div class="admin-section">
-                    <h3>📋 Candidatos Ativos no Banco</h3>
-                    <div class="candidatos-grid" id="lista-candidatos-admin"></div>
-                </div>
-
-                <!-- APURAÇÃO E AUDITORIA -->
-                <div class="admin-section">
-                    <h3>📊 Apuração dos Votos em Tempo Real</h3>
-                    <div id="painel-apuracao" style="font-size: 0.85rem; display: flex; flex-direction: column; gap: 5px;"></div>
-                </div>
-
-                <!-- CONTROLES OPERACIONAIS -->
-                <div class="admin-section">
-                    <h3>🛠️ Manutenção do Sistema</h3>
-                    <button class="btn-admin" style="background: var(--accent-red);" onclick="zerarVotação()">
-                        ⚠️ Zerar Todos os Votos (Zeresima)
-                    </button>
-                </div>
-            </div>
-        </div>
     </div>
 
     <footer>
@@ -293,15 +190,9 @@
     </footer>
 
     <script>
-        // CONFIGURAÇÃO DE SEGURANÇA DO OPERADOR
-        const SENHA_OPERADOR = "1234"; // 🔑 Altere aqui a senha desejada
-        let adminAutenticado = false;
-
-        // ESTADO GLOBAL DA URNA
         let numeroDigitado = '';
         let estadoUrna = 'INICIAL';
         let candidatosBanco = {};
-        let votosRegistrados = {};
 
         const candidatosPadrao = {
             '13': { nome: 'Luís A. da Silva', partido: 'PT', foto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80' },
@@ -309,66 +200,24 @@
             '99': { nome: 'Mortinho da Silva', partido: 'PEX', foto: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80' }
         };
 
-        // CONTROLE DE ACESSO COM SENHA
-        function solicitarAcessoAdmin() {
-            if (adminAutenticado) {
-                bloquearAdmin();
-            } else {
-                document.getElementById('senha-admin-input').focus();
-            }
-        }
-
-        function validarSenha() {
-            const senhaDigitada = document.getElementById('senha-admin-input').value;
-            if (senhaDigitada === SENHA_OPERADOR) {
-                adminAutenticado = true;
-                document.getElementById('auth-overlay').style.display = 'none';
-                document.getElementById('admin-content').classList.add('unlocked');
-                document.getElementById('btn-toggle-admin').textContent = '🔒 Sair Admin';
-                document.getElementById('senha-admin-input').value = '';
-            } else {
-                alert('Senha incorreta! Acesso negado ao painel do operador.');
-                document.getElementById('senha-admin-input').value = '';
-            }
-        }
-
-        function bloquearAdmin() {
-            adminAutenticado = false;
-            document.getElementById('auth-overlay').style.display = 'flex';
-            document.getElementById('admin-content').classList.remove('unlocked');
-            document.getElementById('btn-toggle-admin').textContent = '🔑 Admin';
-        }
-
-        // INICIALIZAÇÃO E MONITORAMENTO FIREBASE
         window.addEventListener('load', () => {
             let checarConexao = setInterval(() => {
                 if (window.db) {
                     clearInterval(checarConexao);
-                    iniciarSincronizacaoFirebase();
+                    window.dbOnValue(window.dbRef(window.db, 'candidatos'), (snapshot) => {
+                        const data = snapshot.val();
+                        if (data) {
+                            candidatosBanco = data;
+                        } else {
+                            window.dbSet(window.dbRef(window.db, 'candidatos'), candidatosPadrao);
+                            candidatosBanco = candidatosPadrao;
+                        }
+                        renderizarTelaUrna();
+                    });
                 }
             }, 300);
         });
 
-        function iniciarSincronizacaoFirebase() {
-            window.dbOnValue(window.dbRef(window.db, 'candidatos'), (snapshot) => {
-                const data = snapshot.val();
-                if (data) {
-                    candidatosBanco = data;
-                } else {
-                    window.dbSet(window.dbRef(window.db, 'candidatos'), candidatosPadrao);
-                    candidatosBanco = candidatosPadrao;
-                }
-                renderizarAdminCandidatos();
-                renderizarTelaUrna();
-            });
-
-            window.dbOnValue(window.dbRef(window.db, 'votos'), (snapshot) => {
-                votosRegistrados = snapshot.val() || {};
-                renderizarApuracao();
-            });
-        }
-
-        // CICLO DA TELA DA URNA
         function renderizarTelaUrna() {
             const corpo = document.getElementById('tela-corpo');
             const foto = document.getElementById('foto-candidato');
@@ -423,7 +272,6 @@
             }
         }
 
-        // TECLADO
         function digitar(num) {
             if (estadoUrna === 'INICIAL' || estadoUrna === 'DIGITANDO') {
                 if (numeroDigitado.length < 2) {
@@ -471,107 +319,6 @@
             setTimeout(() => {
                 corrige();
             }, 2500);
-        }
-
-        // FUNÇÕES ADMINISTRATIVAS (APENAS COM SESSÃO ATIVA)
-        function salvarCandidato(event) {
-            event.preventDefault();
-            if (!adminAutenticado) return;
-
-            const num = document.getElementById('cand-numero').value.trim();
-            const nome = document.getElementById('cand-nome').value.trim();
-            const partido = document.getElementById('cand-partido').value.trim();
-            const foto = document.getElementById('cand-foto').value.trim();
-
-            if (num.length !== 2) {
-                alert('O número deve conter exatamente 2 dígitos.');
-                return;
-            }
-
-            window.dbSet(window.dbRef(window.db, `candidatos/${num}`), {
-                nome: nome,
-                partido: partido,
-                foto: foto
-            }).then(() => {
-                alert(`Candidato [${num}] salvo com sucesso no Firebase!`);
-                document.getElementById('form-candidato').reset();
-            });
-        }
-
-        function removerCandidato(num) {
-            if (!adminAutenticado) return;
-            if (confirm(`Deseja remover o candidato [${num}]?`)) {
-                window.dbRemove(window.dbRef(window.db, `candidatos/${num}`));
-            }
-        }
-
-        function renderizarAdminCandidatos() {
-            const container = document.getElementById('lista-candidatos-admin');
-            container.innerHTML = '';
-
-            Object.keys(candidatosBanco).forEach(num => {
-                const c = candidatosBanco[num];
-                const div = document.createElement('div');
-                div.className = 'candidato-item';
-                div.innerHTML = `
-                    <div style="display:flex; align-items:center; gap: 8px;">
-                        <img src="${c.foto}" alt="Foto">
-                        <div>
-                            <strong>[${num}] ${c.nome}</strong><br>
-                            <small style="color: #94a3b8;">${c.partido}</small>
-                        </div>
-                    </div>
-                    <button onclick="removerCandidato('${num}')" style="background: var(--accent-red); color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer;">Excluir</button>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        function renderizarApuracao() {
-            const panel = document.getElementById('painel-apuracao');
-            const votosArray = Object.values(votosRegistrados);
-            const total = votosArray.length;
-
-            if (total === 0) {
-                panel.innerHTML = '<p>Nenhum voto registrado no sistema.</p>';
-                return;
-            }
-
-            let contagem = { 'BRANCO': 0, 'NULO': 0 };
-            Object.keys(candidatosBanco).forEach(num => contagem[num] = 0);
-
-            votosArray.forEach(v => {
-                if (contagem[v.opcao] !== undefined) {
-                    contagem[v.opcao]++;
-                } else {
-                    contagem['NULO']++;
-                }
-            });
-
-            let html = `<p><strong>Total de Votos Registrados:</strong> ${total}</p><hr style="border-color: var(--border-color); margin: 5px 0;">`;
-
-            Object.keys(candidatosBanco).forEach(num => {
-                let vts = contagem[num] || 0;
-                let pct = ((vts / total) * 100).toFixed(1);
-                html += `<p><strong>[${num}] ${candidatosBanco[num].nome}:</strong> ${vts} votos (${pct}%)</p>`;
-            });
-
-            let pctBranco = ((contagem['BRANCO'] / total) * 100).toFixed(1);
-            let pctNulo = ((contagem['NULO'] / total) * 100).toFixed(1);
-
-            html += `<p><strong>Brancos:</strong> ${contagem['BRANCO']} (${pctBranco}%)</p>`;
-            html += `<p><strong>Nulos:</strong> ${contagem['NULO']} (${pctNulo}%)</p>`;
-
-            panel.innerHTML = html;
-        }
-
-        function zerarVotação() {
-            if (!adminAutenticado) return;
-            if (confirm('Atenção: Deseja apagar TODOS os votos computados no Firebase (Zeresima)?')) {
-                window.dbRemove(window.dbRef(window.db, 'votos')).then(() => {
-                    alert('Todos os votos foram apagados com sucesso!');
-                });
-            }
         }
     </script>
 </body>
