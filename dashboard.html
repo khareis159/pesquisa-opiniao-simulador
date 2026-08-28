@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Apuração e Resultados</title>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --text-light: #f8fafc;
+            --accent-green: #2ed573;
+            --accent-orange: #ff9500;
+            --accent-red: #ff3838;
+            --accent-blue: #3b82f6;
+            --border-color: #334155;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-light); min-height: 100vh; display: flex; flex-direction: column; }
+
+        header {
+            background: var(--card-bg);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-voltar {
+            background: #334155;
+            color: #fff;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        .container {
+            padding: 25px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* TELA DE AUTENTICAÇÃO */
+        .auth-container {
+            max-width: 400px;
+            margin: 60px auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .auth-container input {
+            padding: 10px;
+            background: #0f172a;
+            border: 1px solid var(--border-color);
+            color: #fff;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .btn-login {
+            padding: 10px;
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* CONTEÚDO PRINCIPAL DO DASHBOARD */
+        .dashboard-content { display: none; flex-direction: column; gap: 20px; }
+        .dashboard-content.active { display: flex; }
+
+        /* CARDS KPIS */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+        }
+
+        .kpi-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .kpi-title { font-size: 0.85rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
+        .kpi-value { font-size: 1.8rem; font-weight: bold; color: var(--accent-blue); }
+
+        /* GRID DE CANDIDATOS (CARDS VISUAIS) */
+        .candidatos-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .cand-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cand-card.lider {
+            border: 2px solid var(--accent-green);
+        }
+
+        .cand-badge-lider {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--accent-green);
+            color: #000;
+            font-size: 0.65rem;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .cand-card img {
+            width: 70px;
+            height: 85px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .cand-info { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .cand-nome { font-size: 1.05rem; font-weight: bold; }
+        .cand-partido { font-size: 0.8rem; color: #94a3b8; }
+
+        .progress-bar-bg {
+            background: #0f172a;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-bar-fill {
+            background: var(--accent-blue);
+            height: 100%;
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        /* PAINEL INFERIOR DE GESTÃO E CADASTRO */
+        .admin-sections-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .section-box {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .section-box h3 {
+            font-size: 1rem;
+            color: var(--accent-blue);
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        .form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+        .form-group label { font-size: 0.8rem; color: #94a3b8; }
+        .form-group input { padding: 8px; background: #0f172a; border: 1px solid var(--border-color); color: #fff; border-radius: 4px; font-size: 0.85rem; }
+
+        .btn-action {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            background: var(--accent-blue);
+            color: #fff;
+        }
+
+        footer { background: #0b0f17; color: #94a3b8; padding: 15px; text-align: center; font-size: 0.8rem; border-top: 1px solid var(--border-color); }
+
+        @media (max-width: 900px) {
+            .admin-sections-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+
+    <!-- FIREBASE SDK v10+ (REALTIME DATABASE) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAjkZHH3eNM3kaqLAsLfixIjLSsp7Cc5RI",
+            authDomain: "pesquisa-opiniao-app.firebaseapp.com",
+            databaseURL: "https://pesquisa-opiniao-app-default-rtdb.firebaseio.com",
+            projectId: "pesquisa-opiniao-app",
+            storageBucket: "pesquisa-opiniao-app.firebasestorage.app",
+            messagingSenderId: "982208238909",
+            appId: "1:982208238909:web:c2d8c2c687707438d72154"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        window.db = db;
+        window.dbRef = ref;
+        window.dbSet = set;
+        window.dbPush = push;
+        window.dbOnValue = onValue;
+        window.dbRemove = remove;
+    </script>
+</head>
+<body>
+
+    <header>
+        <h2>📊 Painel Oficial de Apuração & Controle Operational</h2>
+        <a href="index.html" class="btn-voltar">⬅️ Voltar para a Urna</a>
+    </header>
+
+    <div class="container">
+        <!-- BLOQUEIO POR SENHA DO OPERADOR -->
+        <div id="auth-box" class="auth-container">
+            <h3 style="color: var(--accent-orange);">🔒 Restrito ao Operador</h3>
+            <p style="font-size: 0.85rem; color: #94a3b8;">Digite a senha de acesso para visualizar o Dashboard e Gerenciamento do Sistema.</p>
+            <input type="password" id="input-senha" placeholder="Senha do Operador">
+            <button class="btn-login" onclick="autenticar()">Acessar Dashboard</button>
+        </div>
+
+        <!-- TELA DO DASHBOARD EXCLUSIVA -->
+        <div id="dashboard-content" class="dashboard-content">
+            
+            <!-- RESUMO EM CARDS (KPIs) -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <span class="kpi-title">Total de Votos</span>
+                    <span class="kpi-value" id="kpi-total">0</span>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-title">Votos Validos</span>
+                    <span class="kpi-value" style="color: var(--accent-green);" id="kpi-validos">0</span>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-title">Votos Brancos</span>
+                    <span class="kpi-value" style="color: #cbd5e1;" id="kpi-brancos">0</span>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-title">Votos Nulos</span>
+                    <span class="kpi-value" style="color: var(--accent-red);" id="kpi-nulos">0</span>
+                </div>
+            </div>
+
+            <h2 style="font-size: 1.2rem; color: var(--accent-blue); margin-top: 10px;">🏆 Apuração e Desempenho dos Candidatos</h2>
+
+            <!-- CARDS DOS CANDIDATOS -->
+            <div class="candidatos-cards-grid" id="grid-candidatos-cards">
+                <!-- Renderizado via Javascript -->
+            </div>
+
+            <!-- GESTÃO ADMINISTRATIVA -->
+            <div class="admin-sections-grid">
+                <!-- FORMULÁRIO DE CADASTRO -->
+                <div class="section-box">
+                    <h3>➕ Cadastrar Novo Candidato</h3>
+                    <form onsubmit="salvarCandidato(event)">
+                        <div class="form-group">
+                            <label>Número (2 dígitos):</label>
+                            <input type="text" id="cad-num" maxlength="2" required placeholder="Ex: 13">
+                        </div>
+                        <div class="form-group">
+                            <label>Nome Completo:</label>
+                            <input type="text" id="cad-nome" required placeholder="Ex: Maria da Silva">
+                        </div>
+                        <div class="form-group">
+                            <label>Partido / Sigla:</label>
+                            <input type="text" id="cad-partido" required placeholder="Ex: PARTIDO X">
+                        </div>
+                        <div class="form-group">
+                            <label>URL da Foto:</label>
+                            <input type="url" id="cad-foto" required placeholder="https://site.com/foto.jpg">
+                        </div>
+                        <button type="submit" class="btn-action">Salvar no Firebase</button>
+                    </form>
+                </div>
+
+                <!-- ACOES DO SISTEMA -->
+                <div class="section-box" style="display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <h3>🛠️ Relatórios & Zerésima</h3>
+                        <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 15px;">Imprima os relatórios oficiais de apuração ou execute a zerésima para reiniciar a votação.</p>
+                        <button class="btn-action" style="background: #334155; margin-bottom: 10px;" onclick="window.print()">
+                            🖨️ Imprimir Relatório Oficial
+                        </button>
+                    </div>
+                    <div>
+                        <button class="btn-action" style="background: var(--accent-red);" onclick="zerarVotos()">
+                            ⚠️ Zerar Todos os Votos (Zerésima)
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026/2027 Protótipo Demonstrativo — Apoie este projeto enviando um Pix para Zap (61)999487649. O Choro é livre, mas o respeito é obrigatório ©Khareis 2025</p>
+    </footer>
+
+    <script>
+        const SENHA_MESTRE = "1234";
+        let candidatosBanco = {};
+        let votosRegistrados = {};
+
+        function autenticar() {
+            const senha = document.getElementById('input-senha').value;
+            if (senha === SENHA_MESTRE) {
+                document.getElementById('auth-box').style.display = 'none';
+                document.getElementById('dashboard-content').classList.add('active');
+                iniciarSincronizacao();
+            } else {
+                alert('Senha incorreta!');
+            }
+        }
+
+        function iniciarSincronizacao() {
+            window.dbOnValue(window.dbRef(window.db, 'candidatos'), (snapshot) => {
+                candidatosBanco = snapshot.val() || {};
+                processarEExibir();
+            });
+
+            window.dbOnValue(window.dbRef(window.db, 'votos'), (snapshot) => {
+                votosRegistrados = snapshot.val() || {};
+                processarEExibir();
+            });
+        }
+
+        function processarEExibir() {
+            const votosArray = Object.values(votosRegistrados);
+            const totalVotos = votosArray.length;
+
+            let brancos = 0;
+            let nulos = 0;
+            let contagemNominal = {};
+
+            Object.keys(candidatosBanco).forEach(num => contagemNominal[num] = 0);
+
+            votosArray.forEach(v => {
+                if (v.opcao === 'BRANCO') brancos++;
+                else if (v.opcao === 'NULO') nulos++;
+                else if (contagemNominal[v.opcao] !== undefined) contagemNominal[v.opcao]++;
+                else nulos++;
+            });
+
+            const validos = totalVotos - (brancos + nulos);
+
+            // Atualiza KPIs
+            document.getElementById('kpi-total').textContent = totalVotos;
+            document.getElementById('kpi-validos').textContent = validos;
+            document.getElementById('kpi-brancos').textContent = brancos;
+            document.getElementById('kpi-nulos').textContent = nulos;
+
+            // Renderiza Cards dos Candidatos
+            const container = document.getElementById('grid-candidatos-cards');
+            container.innerHTML = '';
+
+            let maiorVotacao = -1;
+            Object.keys(contagemNominal).forEach(num => {
+                if (contagemNominal[num] > maiorVotacao) maiorVotacao = contagemNominal[num];
+            });
+
+            Object.keys(candidatosBanco).forEach(num => {
+                const c = candidatosBanco[num];
+                const vts = contagemNominal[num] || 0;
+                const pct = totalVotos > 0 ? ((vts / totalVotos) * 100).toFixed(1) : "0.0";
+                const eLider = (vts === maiorVotacao && vts > 0);
+
+                const card = document.createElement('div');
+                card.className = `cand-card ${eLider ? 'lider' : ''}`;
+                card.innerHTML = `
+                    ${eLider ? '<span class="cand-badge-lider">Líder</span>' : ''}
+                    <img src="${c.foto}" alt="Foto">
+                    <div class="cand-info">
+                        <span class="cand-nome">[${num}] ${c.nome}</span>
+                        <span class="cand-partido">${c.partido}</span>
+                        <div style="font-size: 0.9rem; font-weight: bold; margin-top: 4px;">
+                            ${vts} votos <span style="color:#94a3b8; font-weight: normal;">(${pct}%)</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" style="width: ${pct}%;"></div>
+                        </div>
+                    </div>
+                    <button onclick="removerCandidato('${num}')" style="background:transparent; border:none; color: var(--accent-red); cursor:pointer; font-size:1.1rem; position:absolute; bottom:10px; right:10px;">🗑️</button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function salvarCandidato(event) {
+            event.preventDefault();
+            const num = document.getElementById('cad-num').value.trim();
+            const nome = document.getElementById('cad-nome').value.trim();
+            const partido = document.getElementById('cad-partido').value.trim();
+            const foto = document.getElementById('cad-foto').value.trim();
+
+            if (num.length !== 2) {
+                alert('O número deve ter 2 dígitos!');
+                return;
+            }
+
+            window.dbSet(window.dbRef(window.db, `candidatos/${num}`), {
+                nome: nome,
+                partido: partido,
+                foto: foto
+            }).then(() => {
+                alert(`Candidato [${num}] registrado com sucesso!`);
+                event.target.reset();
+            });
+        }
+
+        function removerCandidato(num) {
+            if (confirm(`Remover o candidato [${num}]?`)) {
+                window.dbRemove(window.dbRef(window.db, `candidatos/${num}`));
+            }
+        }
+
+        function zerarVotos() {
+            if (confirm('Atenção: Deseja apagar TODOS os votos computados (Zerésima)?')) {
+                window.dbRemove(window.dbRef(window.db, 'votos')).then(() => {
+                    alert('Zerésima executada com sucesso!');
+                });
+            }
+        }
+    </script>
+</body>
+</html>
