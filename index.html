@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plataforma de Pesquisa de Opinião Informatizada</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --accent-color: #3b82f6;
+            --border-color: #334155;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #0f172a;
+            --accent-color: #2563eb;
+            --border-color: #e2e8f0;
+            --success-color: #059669;
+            --danger-color: #dc2626;
+            --warning-color: #d97706;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); min-height: 100vh; transition: background 0.3s, color 0.3s; }
+
+        /* Header & Navigation */
+        header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; background: var(--card-bg); border-bottom: 1px solid var(--border-color); }
+        .nav-controls { display: flex; gap: 10px; align-items: center; }
+        
+        /* Drawer Menu */
+        .drawer { position: fixed; top: 0; right: -300px; width: 300px; height: 100%; background: var(--card-bg); border-left: 1px solid var(--border-color); transition: right 0.3s ease; padding: 2rem; z-index: 1000; box-shadow: -5px 0 15px rgba(0,0,0,0.3); }
+        .drawer.active { right: 0; }
+        .drawer-close { background: none; border: none; color: var(--text-color); font-size: 1.5rem; cursor: pointer; float: right; }
+
+        /* Apex Counter HUD */
+        .apex-counter-hub { font-family: monospace; font-size: 0.75rem; text-align: center; color: var(--warning-color); background: rgba(0,0,0,0.2); padding: 6px 15px; border-radius: 20px; border: 1px solid var(--border-color); display: inline-block; }
+        .apex-counter-hub b { color: var(--text-color); }
+
+        /* Main Grid */
+        .container { display: grid; grid-template-columns: 1fr 350px; gap: 2rem; padding: 2rem; max-width: 1400px; margin: 0 auto; }
+        @media (max-width: 900px) { .container { grid-template-columns: 1fr; } }
+
+        .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; }
+        
+        /* Buttons & Forms */
+        button { cursor: pointer; padding: 0.6rem 1.2rem; border-radius: 6px; border: none; font-weight: 600; transition: opacity 0.2s; }
+        button:hover { opacity: 0.9; }
+        .btn-primary { background: var(--accent-color); color: white; }
+        .btn-success { background: var(--success-color); color: white; }
+        .btn-danger { background: var(--danger-color); color: white; }
+        
+        /* Options List */
+        .candidate-option { display: flex; justify-content: space-between; align-items: center; padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 0.5rem; }
+
+        /* Footer */
+        footer { text-align: center; padding: 2rem; border-top: 1px solid var(--border-color); font-size: 0.85rem; margin-top: 2rem; }
+        .whatsapp-link { color: #25D366; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h2>📊 Pesquisa de Opinião Pública</h2>
+        <div class="nav-controls">
+            <div class="apex-counter-hub">
+                🌐 ACESSOS GLOBAIS: <b id="gCount">...</b> | 👤 SEUS ACESSOS: <b id="lCount">0</b>
+            </div>
+            <button onclick="toggleTheme()" class="btn-primary">🌓 Tema</button>
+            <button onclick="toggleDrawer()" class="btn-primary">☰ Menu</button>
+        </div>
+    </header>
+
+    <!-- Drawer Lateral -->
+    <div id="drawerMenu" class="drawer">
+        <button class="drawer-close" onclick="toggleDrawer()">&times;</button>
+        <h3 style="margin-top: 2rem;">Manual de Uso</h3>
+        <br>
+        <p>Esta plataforma coleta dados estatísticos de intenção de voto de forma anônima e transparente.</p>
+        <br>
+        <h4>Suporte Operacional</h4>
+        <p>Instruções de manutenção e auditoria técnica disponíveis para administradores credenciados.</p>
+    </div>
+
+    <main class="container">
+        <!-- ÁREA PRINCIPAL DA PESQUISA -->
+        <section class="card">
+            <h3>Selecione sua Opção de Voto</h3>
+            <p style="margin-bottom: 1.5rem; opacity: 0.8;">Pesquisa de simulação amostral para análise estatística.</p>
+
+            <div id="candidatesList">
+                <!-- Lista gerada dinamicamente pelo JS -->
+            </div>
+
+            <div style="margin-top: 1.5rem; display: flex; gap: 10px;">
+                <button onclick="registrarVoto()" class="btn-success">Confirmar Opção</button>
+                <button onclick="limparSelecao()" class="btn-danger">Limpar</button>
+            </div>
+        </section>
+
+        <!-- PAINEL ADMINISTRATIVO (VISÃO AUDITORIA) -->
+        <aside class="card">
+            <h3>⚙️ Gestão & Auditabilidade</h3>
+            <br>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button onclick="exportarBackup()" class="btn-primary">📥 Backup em JSON</button>
+                <button onclick="resetarDados()" class="btn-danger">⚠️ Reset de Amostra</button>
+            </div>
+
+            <h4 style="margin-top: 2rem;">Resultados Parciais</h4>
+            <div id="analyticsPanel" style="margin-top: 1rem;">
+                <!-- Resultados consolidados em tempo real -->
+            </div>
+        </aside>
+    </main>
+
+    <footer>
+        <p>© Carlos Alberto Reis 2026/7 — Todos os direitos reservados.</p>
+        <p>Apoio e Suporte Técnico: 
+            <a href="https://wa.me/5561999487649" target="_blank" class="whatsapp-link">
+                📱 WhatsApp (61) 99948-7649
+            </a>
+        </p>
+    </footer>
+
+    <script>
+        // --- 1. GERENCIAMENTO DE TEMA (CLARO/ESCURO) ---
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+        }
+
+        function toggleDrawer() {
+            document.getElementById('drawerMenu').classList.toggle('active');
+        }
+
+        // --- 2. APEX COUNTER MODULE (CONTADOR DETERMINÍSTICO SEM ERROS DE REDE) ---
+        function initApexCounter(config) {
+            const { storageKey, baseValue, growthRate, startDate } = config;
+            
+            let local = parseInt(localStorage.getItem(storageKey)) || 0;
+            local++;
+            localStorage.setItem(storageKey, local);
+            
+            const lElem = document.getElementById('lCount');
+            if (lElem) lElem.textContent = local;
+
+            const launch = new Date(startDate).getTime();
+            const now = new Date().getTime();
+            const daysPassed = Math.floor((now - launch) / (1000 * 60 * 60 * 24));
+            
+            const safeDays = daysPassed > 0 ? daysPassed : 0;
+            const simulatedGlobal = baseValue + (safeDays * growthRate) + local;
+
+            const gElem = document.getElementById('gCount');
+            if (gElem) gElem.textContent = simulatedGlobal.toLocaleString('pt-BR');
+        }
+
+        initApexCounter({
+            storageKey: 'pesquisa_opiniao_v1', 
+            baseValue: 1250,                         
+            growthRate: 18,                          
+            startDate: '2026-01-01'                  
+        });
+
+        // --- 3. GESTÃO DE DADOS DA PESQUISA ---
+        let candidatos = [
+            { id: '01', nome: 'Candidato A', votos: 0 },
+            { id: '02', nome: 'Candidato B', votos: 0 },
+            { id: '00', nome: 'Branco / Nulo', votos: 0 }
+        ];
+
+        let selecionado = null;
+
+        function renderCandidatos() {
+            const container = document.getElementById('candidatesList');
+            container.innerHTML = '';
+            
+            candidatos.forEach(c => {
+                const div = document.createElement('div');
+                div.className = 'candidate-option';
+                div.style.borderColor = selecionado === c.id ? 'var(--accent-color)' : 'var(--border-color)';
+                div.innerHTML = `
+                    <span><strong>[${c.id}]</strong> ${c.nome}</span>
+                    <button class="btn-primary" onclick="selecionar('${c.id}')">
+                        ${selecionado === c.id ? 'Selecionado' : 'Opção'}
+                    </button>
+                `;
+                container.appendChild(div);
+            });
+
+            renderAnalytics();
+        }
+
+        function selecionar(id) {
+            selecionado = id;
+            renderCandidatos();
+        }
+
+        function limparSelecao() {
+            selecionado = null;
+            renderCandidatos();
+        }
+
+        function registrarVoto() {
+            if (!selecionado) {
+                alert('Selecione uma opção antes de confirmar.');
+                return;
+            }
+            const item = candidatos.find(c => c.id === selecionado);
+            if (item) {
+                item.votos++;
+                alert('Sua intenção de voto foi registrada anonimamente!');
+                selecionado = null;
+                renderCandidatos();
+            }
+        }
+
+        function renderAnalytics() {
+            const panel = document.getElementById('analyticsPanel');
+            const total = candidatos.reduce((acc, curr) => acc + curr.votos, 0);
+            
+            let html = `<p><strong>Total de Respostas:</strong> ${total}</p><br>`;
+            candidatos.forEach(c => {
+                const pct = total > 0 ? ((c.votos / total) * 100).toFixed(1) : 0;
+                html += `<p style="font-size: 0.9rem; margin-bottom: 5px;">${c.nome}: ${c.votos} (${pct}%)</p>`;
+            });
+            panel.innerHTML = html;
+        }
+
+        // --- 4. BACKUP E RESET ---
+        function exportarBackup() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(candidatos, null, 2));
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", "pesquisa_backup.json");
+            document.body.appendChild(dlAnchor);
+            dlAnchor.click();
+            dlAnchor.remove();
+        }
+
+        function resetarDados() {
+            if (confirm("Tem certeza que deseja redefinir os dados da amostragem local?")) {
+                candidatos.forEach(c => c.votos = 0);
+                renderCandidatos();
+            }
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', renderCandidatos);
+    </script>
+</body>
+</html>
