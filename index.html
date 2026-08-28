@@ -138,12 +138,18 @@
 </head>
 <body>
 
-    <header>
-        <h2>🗳️ Simulador Oficial de Urna Eletrônica</h2>
-        <a href="dashboard.html" class="btn-link-dashboard">
-            📊 Painel & Dashboard de Apuração
+<!-- Subtítulo / Header do index.html -->
+<header>
+    <h2>🗳️ Simulador Oficial de Urna Eletrônica</h2>
+    <div style="display: flex; gap: 10px;">
+        <a href="resultado.html" class="btn-link-dashboard" style="background: var(--accent-green); color: #000;">
+            📈 Ver Resultados Ao Vivo
         </a>
-    </header>
+        <a href="dashboard.html" class="btn-link-dashboard">
+            ⚙️ Operador
+        </a>
+    </div>
+</header>
 
     <div class="container">
         <div class="urna-wrapper">
@@ -272,15 +278,16 @@
             }
         }
 
-        function digitar(num) {
-            if (estadoUrna === 'INICIAL' || estadoUrna === 'DIGITANDO') {
-                if (numeroDigitado.length < 2) {
-                    numeroDigitado += num;
-                    estadoUrna = 'DIGITANDO';
-                    renderizarTelaUrna();
-                }
-            }
+// Substitua a função digitar no index.html por esta:
+function digitar(num) {
+    if (estadoUrna === 'INICIAL' || estadoUrna === 'DIGITANDO') {
+        if (numeroDigitado.length < 5) { // Permite até 5 dígitos (ex: 12345)
+            numeroDigitado += num;
+            estadoUrna = 'DIGITANDO';
+            renderizarTelaUrna();
         }
+    }
+}
 
         function votarBranco() {
             if (estadoUrna === 'INICIAL' || numeroDigitado === '') {
