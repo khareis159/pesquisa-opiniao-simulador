@@ -693,10 +693,13 @@
                 <h3 style="color: var(--accent-orange);">Acesso Restrito ao Operador</h3>
                 <p style="font-size: 0.85rem; color: var(--text-muted);">Digite a senha mestre de segurança para acessar as funções de administração.</p>
                 
-                <form onsubmit="autenticarAdmin(); return false;">
-                    <input type="password" id="input-senha-admin" placeholder="••••" maxlength="10" autocomplete="current-password">
-                    <button type="submit" class="btn-login">Acessar Painel</button>
-                </form>
+<form onsubmit="autenticarAdmin(); return false;">
+    <!-- Campo de usuário oculto para satisfazer a regra de acessibilidade do Chrome -->
+    <input type="text" name="username" value="admin" autocomplete="username" style="display:none;">
+    
+    <input type="password" id="input-senha-admin" placeholder="••••" maxlength="10" autocomplete="current-password">
+    <button type="submit" class="btn-login">Acessar Painel</button>
+</form>
             </div>
 
             <!-- CONTEÚDO PRINCIPAL DO DASHBOARD -->
