@@ -562,6 +562,7 @@ header {
   padding: 12px;
   margin-bottom: 15px;
   font-size: 0.85rem;
+  color: var(--text-light);
 }
 
 .config-info strong {
@@ -586,7 +587,7 @@ footer {
 }
 
 @media print {
-  header, .nav-tabs, .admin-grid, #auth-admin-box, footer, .btn-delete-cand {
+  header, .nav-tabs, .admin-grid, #auth-admin-box, footer, .btn-delete-cand, #btn-tema {
     display: none !important;
   }
   body { background: #fff; color: #000; }
@@ -622,7 +623,7 @@ window.dbOnValue = onValue;
 window.dbRemove = remove;
 </script>
 </head>
-<body>
+<body data-theme="dark">
 <header>
   <div class="header-title">
     <h2>🗳️ Sistema Eleitoral Pro — Premium Edition v2.0</h2>
@@ -733,7 +734,7 @@ window.dbRemove = remove;
       <p style="font-size: 0.85rem; color: var(--text-muted);">Digite a senha mestre de segurança para acessar as funções de administração.</p>
       <form onsubmit="autenticarAdmin(); return false;">
         <input type="text" name="username" value="admin" autocomplete="username" style="display:none;">
-        <input type="password" id="input-senha-admin" placeholder="••••" maxlength="20" autocomplete="current-password">
+        <input type="password" id="input-senha-admin" placeholder="••••" maxlength="30" autocomplete="current-password">
         <button type="submit" class="btn-login">Acessar Painel</button>
       </form>
     </div>
@@ -944,6 +945,10 @@ function iniciarSincronizacaoFirebase() {
       atualizarUrnaParaConfiguracao();
       atualizarInfoConfiguracao();
       registrarLog(`Configuração carregada: ${TIPOS_ELEICAO[config.tipoEleicao].cargo} (${config.digitos} dígitos)`);
+    } else {
+      // Configuração padrão inicial
+      atualizarUrnaParaConfiguracao();
+      atualizarInfoConfiguracao();
     }
   });
   
