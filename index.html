@@ -42,7 +42,6 @@
             flex-direction: column;
         }
 
-        /* CABEÇALHO DE NAVEGAÇÃO SPA */
         header {
             background: var(--card-bg);
             padding: 1rem 2rem;
@@ -103,7 +102,6 @@
             flex-direction: column;
         }
 
-        /* GERENCIAMENTO DE VIEWS SPA */
         .spa-view {
             display: none;
             width: 100%;
@@ -121,7 +119,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* MÓDULO 1 - URNA ELETRÔNICA */
         .urna-wrapper {
             display: flex;
             justify-content: center;
@@ -292,7 +289,6 @@
         .btn-corrige { background-color: var(--urna-btn-orange); color: #000; }
         .btn-confirma { background-color: var(--urna-btn-green); color: #fff; font-size: 0.85rem; }
 
-        /* KPIS, RANKING E DASHBOARD ADMIN */
         .pulse-live {
             display: inline-flex;
             align-items: center;
@@ -551,7 +547,6 @@
         }
     </style>
 
-    <!-- FIREBASE SDK v10+ (REALTIME DATABASE) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, set, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -596,7 +591,6 @@
         <div id="view-urna" class="spa-view active">
             <div class="urna-wrapper">
                 <div class="urna-container">
-                    <!-- TELA DA URNA -->
                     <div class="urna-screen" id="urna-screen">
                         <div class="screen-header">JUSTIÇA ELEITORAL</div>
                         <div class="screen-body" id="screen-body-content">
@@ -624,7 +618,6 @@
                         </div>
                     </div>
 
-                    <!-- TECLADO FÍSICO/VIRTUAL -->
                     <div class="urna-keypad">
                         <div class="keys-grid">
                             <button class="btn-key" onclick="digitar('1')">1</button>
@@ -648,7 +641,7 @@
             </div>
         </div>
 
-        <!-- VIEW 2: PLACAR AO VIVO (RESULTADOS PÚBLICOS) -->
+        <!-- VIEW 2: PLACAR AO VIVO -->
         <div id="view-placar" class="spa-view">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
                 <h3 style="color: var(--accent-blue); font-size: 1.2rem;">📊 Acompanhamento de Apuração</h3>
@@ -680,29 +673,23 @@
 
             <h4 style="font-size: 1rem; color: var(--text-light); margin-top: 10px;">Quadros de Desempenho dos Candidatos</h4>
 
-            <div class="results-list" id="placar-candidatos-list">
-                <!-- Renderizado via JS -->
-            </div>
+            <div class="results-list" id="placar-candidatos-list"></div>
         </div>
 
-        <!-- VIEW 3: DASHBOARD & GESTÃO ADMINISTRATIVA -->
+        <!-- VIEW 3: DASHBOARD ADMIN -->
         <div id="view-dashboard" class="spa-view">
-            <!-- TELA DE LOGIN ADMIN -->
             <div id="auth-admin-box" class="auth-container">
                 <div style="font-size: 2.5rem;">🔒</div>
                 <h3 style="color: var(--accent-orange);">Acesso Restrito ao Operador</h3>
                 <p style="font-size: 0.85rem; color: var(--text-muted);">Digite a senha mestre de segurança para acessar as funções de administração.</p>
                 
-<form onsubmit="autenticarAdmin(); return false;">
-    <!-- Campo de usuário oculto para satisfazer a regra de acessibilidade do Chrome -->
-    <input type="text" name="username" value="admin" autocomplete="username" style="display:none;">
-    
-    <input type="password" id="input-senha-admin" placeholder="••••" maxlength="10" autocomplete="current-password">
-    <button type="submit" class="btn-login">Acessar Painel</button>
-</form>
+                <form onsubmit="autenticarAdmin(); return false;">
+                    <input type="text" name="username" value="admin" autocomplete="username" style="display:none;">
+                    <input type="password" id="input-senha-admin" placeholder="••••" maxlength="10" autocomplete="current-password">
+                    <button type="submit" class="btn-login">Acessar Painel</button>
+                </form>
             </div>
 
-            <!-- CONTEÚDO PRINCIPAL DO DASHBOARD -->
             <div id="admin-content-box" style="display: none; flex-direction: column; gap: 20px;">
                 <div class="admin-grid">
                     <div class="section-box">
@@ -757,7 +744,6 @@
         <p>© 2026/2027 Protótipo Demonstrativo — Apoie este projeto enviando um Pix para Zap (61)999487649. O Choro é livre, mas o respeito é obrigatório ©Khareis 2025</p>
     </footer>
 
-    <!-- LÓGICA JAVASCRIPT PRINCIPAL -->
     <script>
         const SENHA_MESTRE = "1234";
         let numeroDigitado = "";
