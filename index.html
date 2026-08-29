@@ -121,9 +121,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* -------------------------------------------------------------------------- */
-        /* ESTILOS: MÓDULO 1 - URNA ELETRÔNICA */
-        /* -------------------------------------------------------------------------- */
+        /* MÓDULO 1 - URNA ELETRÔNICA */
         .urna-wrapper {
             display: flex;
             justify-content: center;
@@ -294,9 +292,7 @@
         .btn-corrige { background-color: var(--urna-btn-orange); color: #000; }
         .btn-confirma { background-color: var(--urna-btn-green); color: #fff; font-size: 0.85rem; }
 
-        /* -------------------------------------------------------------------------- */
-        /* ESTILOS: MÓDULO 2 & 3 - KPIS, RANKING E DASHBOARD ADMIN */
-        /* -------------------------------------------------------------------------- */
+        /* KPIS, RANKING E DASHBOARD ADMIN */
         .pulse-live {
             display: inline-flex;
             align-items: center;
@@ -361,7 +357,6 @@
         .kpi-value { font-size: 2rem; font-weight: 800; color: var(--text-light); }
         .kpi-subtext { font-size: 0.75rem; color: var(--text-muted); }
 
-        /* LISTA E CARDS DE CANDIDATOS */
         .results-list {
             display: flex;
             flex-direction: column;
@@ -428,7 +423,6 @@
             transition: width 0.6s ease;
         }
 
-        /* BLOQUEIO DE SEGURANÇA ADMIN */
         .auth-container {
             max-width: 420px;
             margin: 40px auto;
@@ -453,6 +447,7 @@
             font-size: 1.1rem;
             letter-spacing: 3px;
             outline: none;
+            width: 100%;
         }
 
         .btn-login {
@@ -464,11 +459,12 @@
             font-weight: bold;
             cursor: pointer;
             transition: background 0.2s;
+            width: 100%;
+            margin-top: 10px;
         }
 
         .btn-login:hover { opacity: 0.9; }
 
-        /* GESTÃO ADMINISTRATIVA */
         .admin-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -596,9 +592,7 @@
 
     <div class="container">
 
-        <!-- =================================================================== -->
         <!-- VIEW 1: URNA ELETRÔNICA -->
-        <!-- =================================================================== -->
         <div id="view-urna" class="spa-view active">
             <div class="urna-wrapper">
                 <div class="urna-container">
@@ -620,9 +614,7 @@
                                 <div id="voto-especial-msg" style="margin-top: 20px; font-size: 1.3rem; font-weight: bold; display: none;"></div>
                             </div>
                             <div>
-
-    <img id="cand-foto-display" class="cand-photo" src="" alt="Foto" style="display: none;" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'150\' height=\'150\' viewBox=\'0 0 150 150\'><rect width=\'100%\' height=\'100%\' fill=\'%231e293b\'/><text x=\'50%\' y=\'50%\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'%2394a3b8\' font-family=\'sans-serif\' font-size=\'14\'>Sem Foto</text></svg>';">
-                               
+                                <img id="cand-foto-display" class="cand-photo" src="" alt="Foto" style="display: none;" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'150\' height=\'150\' viewBox=\'0 0 150 150\'><rect width=\'100%\' height=\'100%\' fill=\'%231e293b\'/><text x=\'50%\' y=\'50%\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'%2394a3b8\' font-family=\'sans-serif\' font-size=\'14\'>Sem Foto</text></svg>';">
                             </div>
                         </div>
                         <div class="screen-footer" id="screen-footer">
@@ -656,16 +648,13 @@
             </div>
         </div>
 
-        <!-- =================================================================== -->
         <!-- VIEW 2: PLACAR AO VIVO (RESULTADOS PÚBLICOS) -->
-        <!-- =================================================================== -->
         <div id="view-placar" class="spa-view">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
                 <h3 style="color: var(--accent-blue); font-size: 1.2rem;">📊 Acompanhamento de Apuração</h3>
                 <div class="pulse-live"><div class="dot"></div> AO VIVO</div>
             </div>
 
-            <!-- KPIS DA APURAÇÃO -->
             <div class="kpi-grid">
                 <div class="kpi-card">
                     <span class="kpi-title">Total de Votos</span>
@@ -691,29 +680,28 @@
 
             <h4 style="font-size: 1rem; color: var(--text-light); margin-top: 10px;">Quadros de Desempenho dos Candidatos</h4>
 
-            <!-- LISTA ORDENADA DE CANDIDATOS -->
             <div class="results-list" id="placar-candidatos-list">
                 <!-- Renderizado via JS -->
             </div>
         </div>
 
-        <!-- =================================================================== -->
         <!-- VIEW 3: DASHBOARD & GESTÃO ADMINISTRATIVA -->
-        <!-- =================================================================== -->
         <div id="view-dashboard" class="spa-view">
             <!-- TELA DE LOGIN ADMIN -->
             <div id="auth-admin-box" class="auth-container">
                 <div style="font-size: 2.5rem;">🔒</div>
                 <h3 style="color: var(--accent-orange);">Acesso Restrito ao Operador</h3>
                 <p style="font-size: 0.85rem; color: var(--text-muted);">Digite a senha mestre de segurança para acessar as funções de administração.</p>
-                <input type="password" id="input-senha-admin" placeholder="••••" maxlength="10" onkeypress="if(event.key==='Enter') autenticarAdmin()">
-                <button class="btn-login" onclick="autenticarAdmin()">Acessar Painel</button>
+                
+                <form onsubmit="autenticarAdmin(); return false;">
+                    <input type="password" id="input-senha-admin" placeholder="••••" maxlength="10" autocomplete="current-password">
+                    <button type="submit" class="btn-login">Acessar Painel</button>
+                </form>
             </div>
 
             <!-- CONTEÚDO PRINCIPAL DO DASHBOARD -->
             <div id="admin-content-box" style="display: none; flex-direction: column; gap: 20px;">
                 <div class="admin-grid">
-                    <!-- FORMULÁRIO DE CADASTRO -->
                     <div class="section-box">
                         <h3>➕ Cadastrar / Editar Candidato</h3>
                         <form onsubmit="salvarCandidato(event)">
@@ -737,7 +725,6 @@
                         </form>
                     </div>
 
-                    <!-- RECURSOS E ZERÉSIMA -->
                     <div class="section-box" style="display: flex; flex-direction: column; justify-content: space-between;">
                         <div>
                             <h3>🛠️ Central de Zerésima e Relatórios</h3>
@@ -769,7 +756,6 @@
 
     <!-- LÓGICA JAVASCRIPT PRINCIPAL -->
     <script>
-        // CONFIGURAÇÕES E ESTADO GLOBAL
         const SENHA_MESTRE = "1234";
         let numeroDigitado = "";
         let votoEmBranco = false;
@@ -777,7 +763,6 @@
         let votosRegistrados = {};
         let adminAutenticado = false;
 
-        // WEB AUDIO API SINTETIZADOR DE SOM DA URNA
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx;
 
@@ -799,7 +784,7 @@
                 osc.start();
                 osc.stop(audioCtx.currentTime + duracao);
             } catch(e) {
-                console.log("Áudio não suportado ou bloqueado pelo navegador.");
+                console.log("Áudio indisponível ou bloqueado.");
             }
         }
 
@@ -810,7 +795,6 @@
             setTimeout(() => tocarSom(783.99, 'triangle', 0.25), 240);
         }
 
-        // NAVEGAÇÃO ENTRE ABAS SPA
         function mudarAba(aba) {
             document.querySelectorAll('.spa-view').forEach(v => v.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -839,7 +823,6 @@
             }
         }
 
-        // SINCRONIZAÇÃO EM TEMPO REAL COM FIREBASE
         window.addEventListener('load', () => {
             let timer = setInterval(() => {
                 if (window.db) {
@@ -863,7 +846,6 @@
             });
         }
 
-        // URNA: CONTROLE DE TECLAS E DIGITAÇÃO
         function digitar(n) {
             if (votoEmBranco || numeroDigitado.length >= 2) return;
             somTeclas();
@@ -892,7 +874,6 @@
             const foto = document.getElementById('cand-foto-display');
             const msgEspecial = document.getElementById('voto-especial-msg');
 
-            // Reset basico
             d1.textContent = numeroDigitado[0] || "";
             d2.textContent = numeroDigitado[1] || "";
             detalhes.style.display = 'none';
@@ -945,12 +926,11 @@
                     opcaoVoto = "NULO";
                 }
             } else {
-                return; // Não completa se tiver menos de 2 dígitos
+                return;
             }
 
             somConfirma();
 
-            // Grava no Firebase
             window.dbPush(window.dbRef(window.db, 'votos'), {
                 opcao: opcaoVoto,
                 dataHora: new Date().toISOString()
@@ -973,7 +953,6 @@
             }, 2000);
         }
 
-        // SUPORTE AO TECLADO FÍSICO
         document.addEventListener('keydown', (e) => {
             if (!document.getElementById('view-urna').classList.contains('active')) return;
 
@@ -983,13 +962,9 @@
             else if (e.key.toLowerCase() === 'b') votarBranco();
         });
 
-        // PROCESSAMENTO DE DADOS E APURAÇÃO (PLACAR E DASHBOARD)
         function renderizarTodos() {
+            const FOTO_FALLBACK = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150' viewBox='0 0 150 150'><rect width='100%' height='100%' fill='%231e293b'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-family='sans-serif' font-size='14'>Sem Foto</text></svg>";
 
-function renderizarTodos() {
-    
-    const FOTO_FALLBACK = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150' viewBox='0 0 150 150'><rect width='100%' height='100%' fill='%231e293b'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-family='sans-serif' font-size='14'>Sem Foto</text></svg>";
-            
             const votosArray = Object.values(votosRegistrados);
             const totalVotos = votosArray.length;
 
@@ -1008,7 +983,6 @@ function renderizarTodos() {
 
             const validos = totalVotos - (brancos + nulos);
 
-            // Atualiza KPIs do Placar
             document.getElementById('placar-total').textContent = totalVotos;
             document.getElementById('placar-validos').textContent = validos;
             document.getElementById('placar-brancos').textContent = brancos;
@@ -1022,7 +996,6 @@ function renderizarTodos() {
             document.getElementById('placar-brancos-pct').textContent = `${pctBrancos}% do total`;
             document.getElementById('placar-nulos-pct').textContent = `${pctNulos}% do total`;
 
-            // Ordena candidatos por votos recebidos
             let listaOrdenada = Object.keys(candidatosBanco).map(num => ({
                 numero: num,
                 ...candidatosBanco[num],
@@ -1048,7 +1021,7 @@ function renderizarTodos() {
                 row.className = `cand-row ${eLider ? 'lider' : ''}`;
                 row.innerHTML = `
                     ${eLider ? '<span class="cand-badge">Líder</span>' : ''}
-                   <img src="${c.foto || FOTO_FALLBACK}" class="cand-avatar" alt="Foto" onerror="this.onerror=null; this.src='${FOTO_FALLBACK}';">
+                    <img src="${c.foto || FOTO_FALLBACK}" class="cand-avatar" alt="Foto" onerror="this.onerror=null; this.src='${FOTO_FALLBACK}';">
                     <div class="cand-details">
                         <div class="cand-header-info">
                             <div>
@@ -1070,7 +1043,6 @@ function renderizarTodos() {
             });
         }
 
-        // LÓGICA ADMINISTRATIVA & AUTENTICAÇÃO
         function autenticarAdmin() {
             const senha = document.getElementById('input-senha-admin').value;
             if (senha === SENHA_MESTRE) {
