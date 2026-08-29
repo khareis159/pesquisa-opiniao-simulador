@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Urna Eletrônica Pro — Simulador Premium Edition v2.0</title>
+<title>Urna Eletrônica Pro — Premium Edition v2.1</title>
+<!-- FingerprintJS - Biblioteca para identificação única do dispositivo -->
+<script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@4.2.2/dist/fp.min.js"></script>
 <style>
 :root {
   --bg-dark: #0f172a;
@@ -370,6 +372,7 @@ header {
 .kpi-card.brancos::before { background: var(--text-muted); }
 .kpi-card.nulos::before { background: var(--accent-red); }
 .kpi-card.legendas::before { background: var(--accent-purple); }
+.kpi-card.fraude::before { background: var(--accent-orange); }
 
 .kpi-title { font-size: 0.8rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; }
 .kpi-value { font-size: 2rem; font-weight: 800; color: var(--text-light); }
@@ -537,6 +540,7 @@ header {
 .btn-action.red { background: var(--accent-red); }
 .btn-action.secondary { background: #334155; }
 .btn-action.purple { background: var(--accent-purple); }
+.btn-action.orange { background: var(--accent-orange); }
 .btn-action:hover { opacity: 0.9; }
 
 .logs-container {
@@ -567,6 +571,43 @@ header {
 
 .config-info strong {
   color: var(--accent-blue);
+}
+
+.security-info {
+  background: rgba(46, 213, 115, 0.1);
+  border: 1px solid var(--accent-green);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 15px;
+  font-size: 0.8rem;
+  color: var(--text-light);
+  line-height: 1.5;
+}
+
+.security-info strong {
+  color: var(--accent-green);
+}
+
+.fraude-list {
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 10px;
+  max-height: 200px;
+  overflow-y: auto;
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: var(--accent-orange);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fraude-item {
+  padding: 6px;
+  background: rgba(255, 149, 0, 0.1);
+  border-left: 3px solid var(--accent-orange);
+  border-radius: 4px;
 }
 
 footer {
@@ -600,7 +641,7 @@ footer {
 </style>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getDatabase, ref, set, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+import { getDatabase, ref, set, push, onValue, remove, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAjkZHH3eNM3kaqLAsLfixIjLSsp7Cc5RI",
@@ -621,12 +662,13 @@ window.dbSet = set;
 window.dbPush = push;
 window.dbOnValue = onValue;
 window.dbRemove = remove;
+window.dbGet = get;
 </script>
 </head>
 <body data-theme="dark">
 <header>
   <div class="header-title">
-    <h2>🗳️ Sistema Eleitoral Pro — Simulador Premium Edition v2.0</h2>
+    <h2>🗳️ Sistema Eleitoral Pro — Premium Edition v2.1</h2>
   </div>
   <div class="nav-tabs">
     <button class="nav-btn active" onclick="mudarAba('urna')">🗳️ Urna Eletrônica</button>
@@ -721,6 +763,11 @@ window.dbRemove = remove;
         <span class="kpi-value" style="color: var(--accent-purple);" id="placar-legenda">0</span>
         <span class="kpi-subtext" id="placar-legenda-pct">0.0% do total</span>
       </div>
+      <div class="kpi-card fraude">
+        <span class="kpi-title">🛡️ Tentativas Bloqueadas</span>
+        <span class="kpi-value" style="color: var(--accent-orange);" id="placar-fraude">0</span>
+        <span class="kpi-subtext">Votos múltiplos impedidos</span>
+      </div>
     </div>
     <h4 style="font-size: 1rem; color: var(--text-light); margin-top: 10px;">Quadros de Desempenho dos Candidatos</h4>
     <div class="results-list" id="placar-candidatos-list"></div>
@@ -791,25 +838,30 @@ window.dbRemove = remove;
       </div>
       <div class="admin-grid">
         <div class="section-box">
-          <h3>📤 Exportação de Dados</h3>
-          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">
-            Exporte os resultados da eleição em formato CSV para análise externa.
-          </p>
-          <button class="btn-action purple" onclick="exportarResultados('csv')">📊 Exportar CSV</button>
-        </div>
-        <div class="section-box" style="display: flex; flex-direction: column; justify-content: space-between;">
-          <div>
-            <h3>🛠️ Central de Zerésima e Relatórios</h3>
-            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">
-              Emita relatórios consolidados para fiscalização ou execute o procedimento de zerésima para reiniciar a apuração.
-            </p>
-            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-              <button class="btn-action secondary" onclick="window.print()">🖨️ Imprimir Relatório</button>
-              <button class="btn-action red" onclick="zerarVotos()">⚠️ Executar Zerésima</button>
-            </div>
+          <h3>🛡️ Segurança e Auditoria</h3>
+          <div class="security-info">
+            <strong>🔒 Proteção Ativa:</strong> Sistema utiliza FingerprintJS para identificar dispositivos únicos e impedir votos múltiplos. Cada dispositivo pode votar apenas uma vez por eleição.
           </div>
-          <div>
-            <h4 style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">📡 Log de Eventos e Auditoria:</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">
+            Visualize tentativas de voto múltiplo bloqueadas pelo sistema de segurança.
+          </p>
+          <div class="fraude-list" id="fraude-list">
+            <div style="color: var(--text-muted); text-align: center; padding: 10px;">Nenhuma tentativa registrada.</div>
+          </div>
+          <button class="btn-action orange" onclick="limparTentativasFraude()" style="margin-top: 15px;">🗑️ Limpar Histórico de Tentativas</button>
+        </div>
+        <div class="section-box">
+          <h3>📤 Exportação e Zerésima</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">
+            Exporte os resultados ou execute a zerésima para reiniciar a apuração.
+          </p>
+          <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <button class="btn-action purple" onclick="exportarResultados('csv')">📊 Exportar CSV</button>
+            <button class="btn-action secondary" onclick="window.print()">🖨️ Imprimir</button>
+          </div>
+          <button class="btn-action red" onclick="zerarVotos()">⚠️ Executar Zerésima</button>
+          <div style="margin-top: 20px;">
+            <h4 style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">📡 Log de Eventos:</h4>
             <div class="logs-container" id="logs-box">
               <div class="log-entry">[SISTEMA] Painel iniciado com sucesso.</div>
             </div>
@@ -840,11 +892,23 @@ let numeroDigitado = "";
 let votoEmBranco = false;
 let candidatosBanco = {};
 let votosRegistrados = {};
+let tentativasFraude = {};
 let configuracaoEleicao = { tipoEleicao: "PRESIDENTE", ano: 2026 };
 let adminAutenticado = false;
+let fpPromise = null;
 
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 let audioCtx;
+
+// INICIALIZAR FINGERPRINTJS
+window.addEventListener('load', () => {
+  if (window.FingerprintJS) {
+    fpPromise = window.FingerprintJS.load();
+    registrarLog("🛡️ Sistema de segurança (Fingerprint) inicializado.");
+  } else {
+    console.warn("FingerprintJS não carregado. Proteção anti-voto múltiplo desativada.");
+  }
+});
 
 // SISTEMA DE TEMAS
 function alternarTema() {
@@ -890,6 +954,9 @@ function somConfirma() {
   tocarSom(523.25, 'triangle', 0.12);
   setTimeout(() => tocarSom(659.25, 'triangle', 0.12), 120);
   setTimeout(() => tocarSom(783.99, 'triangle', 0.25), 240);
+}
+function somErro() {
+  tocarSom(200, 'sawtooth', 0.3);
 }
 
 // NAVEGAÇÃO SPA
@@ -946,7 +1013,6 @@ function iniciarSincronizacaoFirebase() {
       atualizarInfoConfiguracao();
       registrarLog(`Configuração carregada: ${TIPOS_ELEICAO[config.tipoEleicao].cargo} (${config.digitos} dígitos)`);
     } else {
-      // Configuração padrão inicial
       atualizarUrnaParaConfiguracao();
       atualizarInfoConfiguracao();
     }
@@ -964,6 +1030,12 @@ function iniciarSincronizacaoFirebase() {
     votosRegistrados = snapshot.val() || {};
     registrarLog(`Base de votos sincronizada (${Object.keys(votosRegistrados).length} totais).`);
     renderizarTodos();
+  });
+  
+  // Sincronizar tentativas de fraude
+  window.dbOnValue(window.dbRef(window.db, 'tentativas_fraude'), (snapshot) => {
+    tentativasFraude = snapshot.val() || {};
+    renderizarTentativasFraude();
   });
 }
 
@@ -1024,7 +1096,6 @@ function atualizarTelaUrna() {
   const config = TIPOS_ELEICAO[configuracaoEleicao.tipoEleicao];
   const maxDigitos = config.digitos;
   
-  // Atualizar digit boxes
   for (let i = 1; i <= maxDigitos; i++) {
     const box = document.getElementById(`d${i}`);
     if (box) {
@@ -1033,7 +1104,6 @@ function atualizarTelaUrna() {
     }
   }
   
-  // Atualizar blink
   if (numeroDigitado.length === 0) {
     const d1 = document.getElementById('d1');
     if (d1) d1.classList.add('blink');
@@ -1058,7 +1128,6 @@ function atualizarTelaUrna() {
     document.getElementById('digit-boxes').style.display = 'flex';
   }
   
-  // Verificar se completou todos os dígitos
   if (numeroDigitado.length === maxDigitos) {
     if (candidatosBanco[numeroDigitado]) {
       const c = candidatosBanco[numeroDigitado];
@@ -1077,7 +1146,8 @@ function atualizarTelaUrna() {
   }
 }
 
-function confirma() {
+// FUNÇÃO ASSÍNCRONA DE CONFIRMAÇÃO COM VERIFICAÇÃO DE FINGERPRINT
+async function confirma() {
   const config = TIPOS_ELEICAO[configuracaoEleicao.tipoEleicao];
   let opcaoVoto = "";
   let tipoVoto = "";
@@ -1086,7 +1156,6 @@ function confirma() {
     opcaoVoto = "BRANCO";
     tipoVoto = "BRANCO";
   } else if (numeroDigitado.length === config.digitos) {
-    // Voto completo
     if (candidatosBanco[numeroDigitado]) {
       opcaoVoto = numeroDigitado;
       tipoVoto = "NOMINAL";
@@ -1095,7 +1164,6 @@ function confirma() {
       tipoVoto = "NULO";
     }
   } else if (config.permiteLegenda && numeroDigitado.length > 0 && numeroDigitado.length < config.digitos) {
-    // Voto de legenda (apenas para Vereador)
     opcaoVoto = "LEGENDA";
     tipoVoto = "LEGENDA";
   } else {
@@ -1103,18 +1171,67 @@ function confirma() {
     return;
   }
   
-  somConfirma();
+  // VERIFICAÇÃO DE FINGERPRINT (ANTI-VOTO MÚLTIPLO)
+  if (!fpPromise) {
+    alert("⚠️ Sistema de segurança não inicializado. Tente recarregar a página.");
+    return;
+  }
   
-  window.dbPush(window.dbRef(window.db, 'votos'), {
-    opcao: opcaoVoto,
-    tipoVoto: tipoVoto,
-    tipoEleicao: configuracaoEleicao.tipoEleicao,
-    dataHora: new Date().toISOString()
-  }).then(() => {
+  try {
+    const fp = await fpPromise;
+    const result = await fp.get();
+    const fingerprint = result.visitorId;
+    
+    // Verificar se este dispositivo já votou
+    const votosSnap = await window.dbGet(window.dbRef(window.db, 'votos'));
+    let jaVotou = false;
+    let votoExistente = null;
+    
+    votosSnap.forEach(voto => {
+      const dados = voto.val();
+      if (dados.fingerprint === fingerprint) {
+        jaVotou = true;
+        votoExistente = dados;
+      }
+    });
+    
+    if (jaVotou) {
+      somErro();
+      
+      // Registrar tentativa de fraude
+      window.dbPush(window.dbRef(window.db, 'tentativas_fraude'), {
+        fingerprint: fingerprint,
+        dataHora: new Date().toISOString(),
+        tipoEleicao: configuracaoEleicao.tipoEleicao,
+        userAgent: navigator.userAgent.substring(0, 100)
+      });
+      
+      const dataOriginal = new Date(votoExistente.dataHora).toLocaleString('pt-BR');
+      alert(`🛡️ VOTO BLOQUEADO!\n\nEste dispositivo já registrou um voto nesta eleição.\n\nData do voto original: ${dataOriginal}\n\nPara garantir a integridade da pesquisa científica, cada dispositivo pode votar apenas uma vez.`);
+      registrarLog(`⚠️ Tentativa de voto múltiplo bloqueada (Fingerprint: ${fingerprint.substring(0, 8)}...)`);
+      
+      // Resetar urna
+      corrige();
+      return;
+    }
+    
+    // Voto válido - registrar com fingerprint
+    somConfirma();
+    
+    await window.dbPush(window.dbRef(window.db, 'votos'), {
+      opcao: opcaoVoto,
+      tipoVoto: tipoVoto,
+      tipoEleicao: configuracaoEleicao.tipoEleicao,
+      fingerprint: fingerprint,
+      dataHora: new Date().toISOString()
+    });
+    
     exibirTelaFim();
-  }).catch(err => {
-    alert("Erro ao gravar voto: " + err.message);
-  });
+    
+  } catch (err) {
+    console.error("Erro na verificação de fingerprint:", err);
+    alert("Erro ao verificar segurança do dispositivo. Tente novamente.");
+  }
 }
 
 function exibirTelaFim() {
@@ -1162,12 +1279,14 @@ function renderizarTodos() {
   });
   
   const validos = totalVotos - (brancos + nulos + legendas);
+  const totalFraudes = Object.keys(tentativasFraude).length;
   
   document.getElementById('placar-total').textContent = totalVotos;
   document.getElementById('placar-validos').textContent = validos;
   document.getElementById('placar-brancos').textContent = brancos;
   document.getElementById('placar-nulos').textContent = nulos;
   document.getElementById('placar-legenda').textContent = legendas;
+  document.getElementById('placar-fraude').textContent = totalFraudes;
   
   const pctValidos = totalVotos > 0 ? ((validos / totalVotos) * 100).toFixed(1) : "0.0";
   const pctBrancos = totalVotos > 0 ? ((brancos / totalVotos) * 100).toFixed(1) : "0.0";
@@ -1228,6 +1347,38 @@ function renderizarTodos() {
   });
 }
 
+// RENDERIZAR TENTATIVAS DE FRAUDE
+function renderizarTentativasFraude() {
+  const container = document.getElementById('fraude-list');
+  if (!container) return;
+  
+  const tentativas = Object.values(tentativasFraude);
+  
+  if (tentativas.length === 0) {
+    container.innerHTML = `<div style="color: var(--text-muted); text-align: center; padding: 10px;">✅ Nenhuma tentativa de voto múltiplo registrada.</div>`;
+    return;
+  }
+  
+  container.innerHTML = '';
+  
+  // Ordenar por data (mais recente primeiro)
+  tentativas.sort((a, b) => new Date(b.dataHora) - new Date(a.dataHora));
+  
+  tentativas.forEach(t => {
+    const data = new Date(t.dataHora).toLocaleString('pt-BR');
+    const fpCurto = t.fingerprint ? t.fingerprint.substring(0, 12) + '...' : 'N/A';
+    
+    const item = document.createElement('div');
+    item.className = 'fraude-item';
+    item.innerHTML = `
+      <div><strong>📅</strong> ${data}</div>
+      <div><strong>🔑</strong> Device: ${fpCurto}</div>
+      <div><strong>🗳️</strong> Eleição: ${t.tipoEleicao || 'N/A'}</div>
+    `;
+    container.appendChild(item);
+  });
+}
+
 // AUTENTICAÇÃO ADMIN
 function autenticarAdmin() {
   const senha = document.getElementById('input-senha-admin').value;
@@ -1238,6 +1389,7 @@ function autenticarAdmin() {
     document.getElementById('admin-content-box').style.display = 'flex';
     registrarLog("Operador autenticado com sucesso.");
     renderizarTodos();
+    renderizarTentativasFraude();
   } else {
     alert("Senha mestre incorreta!");
     document.getElementById('input-senha-admin').value = "";
@@ -1310,6 +1462,16 @@ function zerarVotos() {
   }
 }
 
+// LIMPAR TENTATIVAS DE FRAUDE
+function limparTentativasFraude() {
+  if (confirm("Deseja limpar o histórico de tentativas de voto múltiplo?")) {
+    window.dbRemove(window.dbRef(window.db, 'tentativas_fraude')).then(() => {
+      registrarLog("Histórico de tentativas de fraude limpo.");
+      alert("Histórico limpo com sucesso!");
+    });
+  }
+}
+
 // EXPORTAÇÃO CSV
 function exportarResultados(formato) {
   const votosArray = Object.values(votosRegistrados);
@@ -1330,10 +1492,11 @@ function exportarResultados(formato) {
   
   const validos = totalVotos - (brancos + nulos + legendas);
   const config = TIPOS_ELEICAO[configuracaoEleicao.tipoEleicao];
+  const totalFraudes = Object.keys(tentativasFraude).length;
   
   if (formato === 'csv') {
-    let csv = "Tipo Eleição,Cargo,Ano,Total Votos,Válidos,Brancos,Nulos,Legendas\n";
-    csv += `${configuracaoEleicao.tipoEleicao},${config.cargo},${configuracaoEleicao.ano},${totalVotos},${validos},${brancos},${nulos},${legendas}\n\n`;
+    let csv = "Tipo Eleição,Cargo,Ano,Total Votos,Válidos,Brancos,Nulos,Legendas,Tentativas Bloqueadas\n";
+    csv += `${configuracaoEleicao.tipoEleicao},${config.cargo},${configuracaoEleicao.ano},${totalVotos},${validos},${brancos},${nulos},${legendas},${totalFraudes}\n\n`;
     
     csv += "Número,Nome,Partido,Votos,Percentual Válidos,Percentual Total\n";
     
@@ -1355,8 +1518,8 @@ function exportarResultados(formato) {
     link.click();
     document.body.removeChild(link);
     
-    registrarLog(`Resultados exportados em CSV (${totalVotos} votos totais).`);
-    alert(`Resultados exportados com sucesso!\n\nTotal de votos: ${totalVotos}\nVálidos: ${validos}\nBrancos: ${brancos}\nNulos: ${nulos}\nLegendas: ${legendas}`);
+    registrarLog(`Resultados exportados em CSV (${totalVotos} votos totais, ${totalFraudes} tentativas bloqueadas).`);
+    alert(`Resultados exportados com sucesso!\n\nTotal de votos: ${totalVotos}\nVálidos: ${validos}\nBrancos: ${brancos}\nNulos: ${nulos}\nLegendas: ${legendas}\nTentativas bloqueadas: ${totalFraudes}`);
   }
 }
 </script>
