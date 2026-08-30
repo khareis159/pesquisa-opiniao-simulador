@@ -1471,8 +1471,8 @@ function limparTentativasFraude() {
     });
   }
 }
-
 // EXPORTAÇÃO CSV
+
 function exportarResultados(formato) {
   const votosArray = Object.values(votosRegistrados);
   const totalVotos = votosArray.length;
@@ -1495,10 +1495,10 @@ function exportarResultados(formato) {
   const totalFraudes = Object.keys(tentativasFraude).length;
   
   if (formato === 'csv') {
-    let csv = "Tipo Eleição,Cargo,Ano,Total Votos,Válidos,Brancos,Nulos,Legendas,Tentativas Bloqueadas\n";
-    csv += `${configuracaoEleicao.tipoEleicao},${config.cargo},${configuracaoEleicao.ano},${totalVotos},${validos},${brancos},${nulos},${legendas},${totalFraudes}\n\n`;
-    
-    csv += "Número,Nome,Partido,Votos,Percentual Válidos,Percentual Total\n";
+    // USO DE CRASES (`) E \n PARA QUEBRA DE LINHA CORRETA
+    let csv = `Tipo Eleição,Cargo,Ano,Total Votos,Válidos,Brancos,Nulos,Legendas,Tentativas Bloqueadas\n`;
+    csv += `${configuracaoEleicao.tipoEleicao},${config.cargo},${configuracaoEleicao.ano},${totalVotos},${validos},${brancos},${nulos},${legendas},${totalFraudes}\n`;
+    csv += `Número,Nome,Partido,Votos,Percentual Válidos,Percentual Total\n`;
     
     Object.keys(candidatosBanco).forEach(num => {
       const cand = candidatosBanco[num];
