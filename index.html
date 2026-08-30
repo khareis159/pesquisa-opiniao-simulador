@@ -698,9 +698,7 @@ window.dbGet = get;
               </div>
               <div id="voto-especial-msg" style="margin-top: 20px; font-size: 1.3rem; font-weight: bold; display: none;"></div>
             </div>
-                  
-              <img id="cand-foto-display" class="cand-photo" src="" alt="Foto" style="display: none;" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'150\' height=\'150\'><rect width=\'100%\' height=\'100%\' fill=\'%231e293b\'/><text x=\'50%\' y=\'50%\' fill=\'%2394a3b8\' text-anchor=\'middle\'>Sem Foto</text></svg>';">
-            
+           <img id="cand-foto-display" class="cand-photo" src="" alt="Foto" style="display: none;" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=http://www.w3.org/2000/svg width=150 height=150><rect width=100% height=100% fill=%231e293b/><text x=50% y=50% dominant-baseline=middle text-anchor=middle fill=%2394a3b8 font-family=sans-serif font-size=14>Sem Foto</text></svg>';">
           </div>
           <div class="screen-footer" id="screen-footer">
             Aperte a tecla:<br>
@@ -1258,9 +1256,7 @@ document.addEventListener('keydown', (e) => {
 
 // RENDERIZAÇÃO DO PLACAR
 function renderizarTodos() {
-
-  const FOTO_FALLBACK = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150' viewBox='0 0 150 150'><rect width='100%' height='100%' fill='%231e293b'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-family='sans-serif' font-size='14'>Sem Foto</text></svg>`;
-  
+  const FOTO_FALLBACK = "data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22150%22 height=%22150%22><rect width=%22100%%22 height=%22100%%22 fill=%231e293b/><text x=%2250%%22 y=%2250%%22 fill=%2394a3b8 text-anchor=%22middle%22>Sem Foto</text></svg>";
   const votosArray = Object.values(votosRegistrados);
   const totalVotos = votosArray.length;
   
