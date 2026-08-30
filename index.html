@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+<link rel="icon" href="data:,">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Urna Eletrônica Pro — Premium Edition v2.1</title>
@@ -30,7 +31,6 @@
   --input-bg: var(--bg-dark);
   --input-text: var(--text-light);
 }
-
 [data-theme="light"] {
   --bg-dark: #f1f5f9;
   --bg-darker: #e2e8f0;
@@ -43,14 +43,12 @@
   --input-bg: #f8fafc;
   --input-text: #0f172a;
 }
-
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
-
 body {
   background-color: var(--bg-dark);
   color: var(--text-light);
@@ -59,7 +57,6 @@ body {
   flex-direction: column;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
-
 header {
   background: var(--card-bg);
   padding: 1rem 2rem;
@@ -72,7 +69,6 @@ header {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
   transition: background-color 0.3s ease;
 }
-
 .header-title h2 {
   font-size: 1.25rem;
   font-weight: 700;
@@ -81,13 +77,11 @@ header {
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
-
 .nav-tabs {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
 }
-
 .nav-btn {
   background: #334155;
   color: #fff;
@@ -102,18 +96,15 @@ header {
   align-items: center;
   gap: 6px;
 }
-
 .nav-btn:hover {
   background: #475569;
   transform: translateY(-1px);
 }
-
 .nav-btn.active {
   background: var(--accent-blue);
   border-color: var(--accent-blue);
   color: #fff;
 }
-
 .container {
   padding: 25px;
   max-width: 1400px;
