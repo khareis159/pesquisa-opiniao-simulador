@@ -698,8 +698,9 @@ window.dbGet = get;
               </div>
               <div id="voto-especial-msg" style="margin-top: 20px; font-size: 1.3rem; font-weight: bold; display: none;"></div>
             </div>
-            <div>
-        <img id="cand-foto-display" class="cand-photo" src="" alt="Foto" style="display: none;" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;150&quot; height=&quot;150&quot; viewBox=&quot;0 0 150 150&quot;><rect width=&quot;100%&quot; height=&quot;100%&quot; fill=&quot;%231e293b&quot;/><text x=&quot;50%&quot; y=&quot;50%&quot; dominant-baseline=&quot;middle&quot; text-anchor=&quot;middle&quot; fill=&quot;%2394a3b8&quot; font-family=&quot;sans-serif&quot; font-size=&quot;14&quot;>Sem Foto</text></svg>';">            </div>
+                  
+              <img id="cand-foto-display" class="cand-photo" src="" alt="Foto" style="display: none;" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'150\' height=\'150\'><rect width=\'100%\' height=\'100%\' fill=\'%231e293b\'/><text x=\'50%\' y=\'50%\' fill=\'%2394a3b8\' text-anchor=\'middle\'>Sem Foto</text></svg>';">
+            
           </div>
           <div class="screen-footer" id="screen-footer">
             Aperte a tecla:<br>
@@ -1258,7 +1259,7 @@ document.addEventListener('keydown', (e) => {
 // RENDERIZAÇÃO DO PLACAR
 function renderizarTodos() {
 
-  const FOTO_FALLBACK = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150' viewBox='0 0 150 150'><rect width='100%' height='100%' fill='%231e293b'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-family='sans-serif' font-size='14'>Sem Foto</text></svg>";
+  const FOTO_FALLBACK = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150' viewBox='0 0 150 150'><rect width='100%' height='100%' fill='%231e293b'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-family='sans-serif' font-size='14'>Sem Foto</text></svg>`;
   
   const votosArray = Object.values(votosRegistrados);
   const totalVotos = votosArray.length;
